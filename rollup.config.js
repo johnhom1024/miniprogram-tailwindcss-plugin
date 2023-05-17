@@ -22,5 +22,8 @@ export default defineConfig({
     typescript({
       tsconfig: path.resolve(__dirname, 'tsconfig.json')
     })
+  ],
+  external: [
+    /node_modules/
   ]
 })

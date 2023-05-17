@@ -1,6 +1,7 @@
 import { Compilation, Compiler, WebpackPluginInstance } from 'webpack';
-
-class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
+import { cssMatcher } from './utils/index';
+import { styleHander } from './lib/index'
+export class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
   options = {};
 
   constructor(options: any) {
@@ -12,12 +13,12 @@ class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
     compiler.hooks.emit.tap(pluginName, (compilation: Compilation) => {
       const entries = Object.entries(compilation.assets);
       for (const [filename, originalSource] of entries) {
-        console.log('----------johnhomLogDebug filename', filename);
-        const rawSource = originalSource.source().toString()
-        console.log('----------johnhomLogDebug rawSource', rawSource);
+        // 如果是main.wxss文件，则获取source
+        if (cssMatcher(filename)) {
+          const cssSource = originalSource.source().toString();
+          styleHander(cssSource);
+        }
       }
     })
   }
 }
-
-export default UniappTailwindcssWebpackPlugin;

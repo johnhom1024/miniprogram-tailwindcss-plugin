@@ -1,6 +1,6 @@
 import { Compilation, Compiler, WebpackPluginInstance } from 'webpack';
 
-class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
+export class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
   options = {};
 
   constructor(options: any) {
@@ -27,5 +27,3 @@ class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
     });
   }
 }
-
-export default UniappTailwindcssWebpackPlugin;
