@@ -1,0 +1,19 @@
+{
+  "name": "uniapp-tailwindcss-webpack-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "rollup": "^3.22.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "typescript": "^5.0.4",
+    "webpack": "^5.82.1"
+  }
+}
