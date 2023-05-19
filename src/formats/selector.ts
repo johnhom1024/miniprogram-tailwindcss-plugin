@@ -1,5 +1,6 @@
 import selectorParser from 'postcss-selector-parser';
 import escapeStringRegexp from 'escape-string-regexp';
+import { parse as styleParser } from 'postcss';
 import { SimpleMappingChars2String } from '../lib/dict';
 abstract class SelectorTransformer {
   mappingChars2String: Record<string, string>;
@@ -25,8 +26,11 @@ abstract class SelectorTransformer {
        * 需要先转换成 \. 然后再给到new RegExp ，最终生成 /\./
        * 这样可以匹配 . 字符 然后替换成 微信小程序中支持的字符
        */
-      const regexp = new RegExp(escapeStringRegexp(k));
-      className = className.replaceAll(regexp, v);
+      const regexp = new RegExp(escapeStringRegexp(k), 'g');
+      if (regexp.test(className)) {
+        console.log('----------johnhomLogDebug className', className);
+        className = className.replaceAll(regexp, v);
+      }
     });
 
     return className;
@@ -42,11 +46,32 @@ export class StyleSelectorTransformer extends SelectorTransformer {
     super({customMappingChars2String});
   }
 
-  styleHanlder(rawSource: string) {
-    selectorParser((root) => {
-      root.walkClasses((classNode) => {
-        classNode.value = this.transform(classNode.value);
+  selectorHandler(selector: string) {
+    const result = selectorParser((selector) => {
+      selector.walkClasses((classNode) => {
+        if (classNode.type === 'class') {
+          classNode.value = this.transform(classNode.value);
+        }
+
+
+
+        // 如果最后长度为0，则直接删掉该类
+        if (classNode.value.length === 0) {
+          classNode.remove();
+        }
       })
-    }).processSync(rawSource);
+    }).processSync(selector);
+
+    return result;
+  }
+
+  styleHandler(rawSource: string) {
+
+    const root = styleParser(rawSource)
+    root.walkRules(rule => {
+      rule.selector = this.selectorHandler(rule.selector);
+    })
+
+    return root.toString();
   }
 }
