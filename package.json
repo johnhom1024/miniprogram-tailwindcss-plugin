@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@rollup/plugin-node-resolve": "^15.0.2",
+    "escape-string-regexp": "^5.0.0",
     "postcss": "^8.4.23",
+    "postcss-selector-parser": "^6.0.13",
     "rollup": "^3.22.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "typescript": "^5.0.4",
