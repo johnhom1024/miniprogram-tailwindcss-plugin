@@ -24,10 +24,10 @@ export class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
         // 如果是main.wxss文件，则获取source
         if (cssMatcher(filename)) {
           const cssSource = originalSource.source().toString();
-          const newRawSource = this.styleSelectorTransformer.styleHandler(cssSource);
+          const newCssSource = this.styleSelectorTransformer.styleHandler(cssSource);
+          const updateAsset = new RawSource(newCssSource)
 
-          const updateAsset = new RawSource(newRawSource)
-
+          // 更新原本的资产
           compilation.updateAsset(filename, updateAsset);
         }
       }

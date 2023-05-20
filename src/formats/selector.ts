@@ -1,6 +1,8 @@
 import selectorParser from 'postcss-selector-parser';
+import type { ClassName, Root } from 'postcss-selector-parser';
 import escapeStringRegexp from 'escape-string-regexp';
 import { parse as styleParser } from 'postcss';
+import type { Rule } from 'postcss';
 import { SimpleMappingChars2String } from '../lib/dict';
 abstract class SelectorTransformer {
   mappingChars2String: Record<string, string>;
@@ -47,13 +49,11 @@ export class StyleSelectorTransformer extends SelectorTransformer {
   }
 
   selectorHandler(selector: string) {
-    const result = selectorParser((selector) => {
-      selector.walkClasses((classNode) => {
+    const result = selectorParser((selector: Root) => {
+      selector.walkClasses((classNode: ClassName) => {
         if (classNode.type === 'class') {
           classNode.value = this.transform(classNode.value);
         }
-
-
 
         // 如果最后长度为0，则直接删掉该类
         if (classNode.value.length === 0) {
@@ -68,7 +68,7 @@ export class StyleSelectorTransformer extends SelectorTransformer {
   styleHandler(rawSource: string) {
 
     const root = styleParser(rawSource)
-    root.walkRules(rule => {
+    root.walkRules((rule: Rule) => {
       rule.selector = this.selectorHandler(rule.selector);
     })
 
