@@ -30,7 +30,6 @@ abstract class SelectorTransformer {
        */
       const regexp = new RegExp(escapeStringRegexp(k), 'g');
       if (regexp.test(className)) {
-        console.log('----------johnhomLogDebug className', className);
         className = className.replaceAll(regexp, v);
       }
     });
@@ -73,5 +72,14 @@ export class StyleSelectorTransformer extends SelectorTransformer {
     })
 
     return root.toString();
+  }
+
+  /**
+   * @description: 处理html代码中的class
+   * @param {string} rawSource
+   * @return {*}
+   */  
+  htmlHandler(rawSource: string) {
+
   }
 }
