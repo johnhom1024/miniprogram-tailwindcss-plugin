@@ -15,3 +15,9 @@ export const variableRegExp = /{{(.*?)}}/gs;
 export function variableMatch(original: string) {
   return variableRegExp.exec(original);
 }
+
+// 匹配 main.wxss 文件
+export const mainCssFileReg = /main\.wxss$/;
+
+// 匹配 .wxml 文件
+export const wxmlFileReg = /.+\.wxml$/;

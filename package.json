@@ -23,6 +23,7 @@
     "@babel/parser": "^7.21.9",
     "@babel/traverse": "^7.21.5",
     "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "escape-string-regexp": "^5.0.0",
     "postcss": "^8.4.23",

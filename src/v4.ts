@@ -1,5 +1,5 @@
 import { Compilation, Compiler, WebpackPluginInstance } from 'webpack';
-import { cssMatcher } from './utils/index';
+import { cssMatcher, wxmlMatcher } from './utils/index';
 import { StyleSelectorTransformer } from './formats/selector';
 import { PluginOptions } from './types';
 
@@ -28,6 +28,12 @@ export class UniappTailwindcssWebpackPlugin implements WebpackPluginInstance {
           const updateAsset = new RawSource(newCssSource)
 
           // 更新原本的资产
+          compilation.updateAsset(filename, updateAsset);
+        } else if(wxmlMatcher(filename)) {
+          const wxmlSource = originalSource.source().toString();
+          const newWxmlSource = this.styleSelectorTransformer.templateHandler(wxmlSource);
+
+          const updateAsset = new RawSource(newWxmlSource);
           compilation.updateAsset(filename, updateAsset);
         }
       }
