@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs"
   },
@@ -10,8 +19,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/generator": "^7.21.9",
+    "@babel/parser": "^7.21.9",
+    "@babel/traverse": "^7.21.5",
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
+    "escape-string-regexp": "^5.0.0",
     "postcss": "^8.4.23",
+    "postcss-selector-parser": "^6.0.13",
     "rollup": "^3.22.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "typescript": "^5.0.4",
@@ -19,6 +35,8 @@
   },
   "devDependencies": {
     "@johnhom/eslint-config-ts": "^0.3.2",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.18.5",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8"
