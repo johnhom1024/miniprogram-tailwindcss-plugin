@@ -3,6 +3,7 @@ import type { ClassName, Root } from 'postcss-selector-parser';
 import escapeStringRegexp from 'escape-string-regexp';
 import { parse as styleParser } from 'postcss';
 import type { Rule } from 'postcss';
+import { Source } from 'webpack-sources';
 
 import generate from '@babel/generator';
 import { parseExpression } from '@babel/parser';
@@ -13,12 +14,14 @@ import {
   tagWithEitherClassAndHoverClassRegexp,
   vueTemplateClassRegexp,
   variableRegExp,
+  mainCssFileReg,
+  wxmlFileReg,
 } from '../lib/reg';
 
-abstract class SelectorTransformer {
+export class SelectorTransformer {
   mappingChars2String: Record<string, string>;
   constructor({
-    customMappingChars2String = SimpleMappingChars2String,
+    customMappingChars2String,
   }: {
     customMappingChars2String: Record<string, string>;
   }) {
@@ -49,7 +52,7 @@ abstract class SelectorTransformer {
   }
 }
 
-export class StyleSelectorTransformer extends SelectorTransformer {
+export class WechatSelectorTransformer extends SelectorTransformer {
   constructor({
     customMappingChars2String = SimpleMappingChars2String,
   }: {
@@ -58,7 +61,75 @@ export class StyleSelectorTransformer extends SelectorTransformer {
     super({ customMappingChars2String });
   }
 
-  selectorHandler(selector: string) {
+  /**
+   * @description: 匹配css文件
+   * @param {string} filename
+   * @return {boolean}
+   */
+  _cssMatcher(filename: string): boolean {
+    return mainCssFileReg.test(filename);
+  }
+
+  /**
+   * @description: 匹配 .wxml文件
+   * @param {string} filename
+   * @return {*}
+   */
+  _wxmlMatcher(filename: string): boolean {
+    return wxmlFileReg.test(filename);
+  }
+
+  /**
+   * @description: 接收filename 并把匹配的文件进行处理，并把处理后的字符串放到callback中执行
+   * @param {string} filename
+   * @param {string} originalSource
+   * @param {function} callback
+   */
+  traverse(
+    filename: string,
+    originalSource: Source,
+    callback: (arg: string) => void
+  ): void {
+    const source = originalSource.source().toString();
+    let newSource = '';
+    if (this._cssMatcher(filename)) {
+      newSource = this.styleHandler(source);
+    } else if (this._wxmlMatcher(filename)) {
+      newSource = this.wxmlHandler(source);
+    }
+
+    // 如果进行过处理，则执行callback
+    if (newSource) {
+      callback(newSource);
+    }
+  }
+
+  styleHandler(rawSource: string): string {
+    const root = styleParser(rawSource);
+    root.walkRules((rule: Rule) => {
+      rule.selector = this._styleTransform(rule.selector);
+    });
+
+    return root.toString();
+  }
+
+  /**
+   * @description: 处理html代码中的class
+   * @param {string} rawSource
+   * @return {*}
+   */
+  wxmlHandler(rawSource: string): string {
+    // 这里匹配开头的标签，例如：<view class="content">
+    return rawSource.replace(tagWithEitherClassAndHoverClassRegexp, (m0) => {
+      return m0.replace(vueTemplateClassRegexp, (match, className) => {
+        // match 匹配的结构为 class="font-bold"
+        // className的结构为 font-bold flex-[0_0_300rpx] 等
+        return match.replace(className, this._wxmlTransform(className));
+      });
+    });
+  }
+
+  _styleTransform(selector: string) {
     const result = selectorParser((selector: Root) => {
       selector.walkClasses((classNode: ClassName) => {
         if (classNode.type === 'class') {
@@ -75,32 +146,7 @@ export class StyleSelectorTransformer extends SelectorTransformer {
     return result;
   }
 
-  styleHandler(rawSource: string): string {
-    const root = styleParser(rawSource);
-    root.walkRules((rule: Rule) => {
-      rule.selector = this.selectorHandler(rule.selector);
-    });
-
-    return root.toString();
-  }
-
-  /**
-   * @description: 处理html代码中的class
-   * @param {string} rawSource
-   * @return {*}
-   */
-  templateHandler(rawSource: string): string {
-    // 这里匹配开头的标签，例如：<view class="content">
-    return rawSource.replace(tagWithEitherClassAndHoverClassRegexp, (m0) => {
-      return m0.replace(vueTemplateClassRegexp, (match, className) => {
-        // match 匹配的结构为 class="font-bold"
-        // className的结构为 font-bold flex-[0_0_300rpx] 等
-        return match.replace(className, this.templateReplacer(className));
-      });
-    });
-  }
-
-  templateReplacer(className: string): string {
+  _wxmlTransform(className: string): string {
     function variableMatch(original: string) {
       return variableRegExp.exec(original);
     }
