@@ -25,7 +25,11 @@ export class SelectorTransformer {
   }: {
     customMappingChars2String: Record<string, string>;
   }) {
-    this.mappingChars2String = customMappingChars2String;
+    this.mappingChars2String = {
+      ...SimpleMappingChars2String,
+      // 这里是外部传入的自定义字符转换
+      ...customMappingChars2String,
+    };
   }
 
   /**
