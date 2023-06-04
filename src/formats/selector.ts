@@ -9,7 +9,7 @@ import generate from '@babel/generator';
 import { parseExpression } from '@babel/parser';
 import traverse from '@babel/traverse';
 
-import { SimpleMappingChars2String } from '../lib/dict';
+import { SimpleMappingChars2String } from '@/lib/dict';
 import {
   tagWithEitherClassAndHoverClassRegexp,
   vueTemplateClassRegexp,

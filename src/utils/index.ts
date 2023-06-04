@@ -1,4 +1,4 @@
-import { wxmlFileReg, mainCssFileReg } from "../lib/reg";
+import { wxmlFileReg, mainCssFileReg } from "@/lib/reg";
 
 
 // 匹配uniapp中的main.wxss文件
