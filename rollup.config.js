@@ -1,5 +1,6 @@
 import nodeResolve from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
+import del from 'rollup-plugin-delete';
+import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import commonjs from '@rollup/plugin-commonjs';
 import path from 'path';
@@ -24,6 +25,9 @@ export default defineConfig({
     },
   ],
   plugins: [
+    del({
+      targets: 'dist/*',
+    }),
     // 解析第三方依赖
     nodeResolve(),
     // commonjs一般与@rollup/plugin-node-resolve配合使用
