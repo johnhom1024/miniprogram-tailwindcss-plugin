@@ -7,6 +7,7 @@
     "draft": false
   },
   "npm": {
+    "versionArgs": ["--allow-same-version"],
     "publish": true
   },
   "hooks": {
