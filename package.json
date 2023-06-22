@@ -2,9 +2,10 @@
   "name": "miniprogram-tailwindcss-plugin",
   "version": "1.0.0",
   "description": "",
+  "author": "johnhom",
   "main": "./dist/index.js",
+  "type": "commonjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -12,12 +13,24 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
+  "keywords": [
+    "tailwindcss",
+    "miniprogram"
+  ],
+  "homepage": "https://github.com/johnhom1024/tool-cli/tree/main/packages/mrm-preset",
+  "repository": "https://github.com/johnhom1024/tool-cli/tree/main/packages/mrm-preset",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "dependencies": {
     "@babel/generator": "^7.21.9",
     "@babel/parser": "^7.21.9",
