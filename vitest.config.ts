@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      '@test': resolve(__dirname, 'test'),
     }
   }
 })
