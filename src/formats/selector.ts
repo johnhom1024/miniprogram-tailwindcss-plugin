@@ -137,6 +137,7 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     const result = selectorParser((selector: Root) => {
       selector.walkClasses((classNode: ClassName) => {
         if (classNode.type === 'class') {
+          // 这里会吞掉 \ 字符
           classNode.value = this.transform(classNode.value);
         }
 
