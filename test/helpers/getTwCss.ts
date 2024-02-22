@@ -22,7 +22,7 @@ export async function getTwCss(input: string | string[]) {
       }),
     }),
   ]);
-  console.log('----------johnhomLogDebug input: ', input);
+
   const result = await processor.process(css, { from: undefined });
 
   return result;
