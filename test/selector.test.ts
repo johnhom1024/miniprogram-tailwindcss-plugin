@@ -28,10 +28,16 @@ describe('测试selector转换', () => {
     const wxssString = `.hover\\:via-blue-50:hover {
       background-color: blue;
     }`;
-    console.log(wxssString);
+
     expect(selectorTransformer.styleHandler(wxssString))
       .toBe(`.hovercvia-blue-50:hover {
       background-color: blue;
     }`);
+  });
+
+  it('测试wxml中的class变量转换', () => {
+    const wxmlString = `<div :class="{{show ? 'w-[20rpx]' : 'w-2/3'}}">Hello, world!</div>`;
+
+    expect(selectorTransformer.wxmlHandler(wxmlString)).toBe(`<div :class="{{show ? 'w-_20rpx_' : 'w-2s3'}}">Hello, world!</div>`);
   });
 });
