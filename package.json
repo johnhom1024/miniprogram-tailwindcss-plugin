@@ -19,7 +19,8 @@
   ],
   "scripts": {
     "release": "release-it",
-    "build": "rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs",
+    "test": "vitest"
   },
   "license": "ISC",
   "keywords": [
@@ -60,7 +61,9 @@
     "prettier": "^2.8.8",
     "release-it": "^15.11.0",
     "rollup-plugin-delete": "^2.0.0",
-    "tslib": "^2.6.2",
+    "tailwindcss": "^3.4.1",
+    "tslib": "^2.5.3",
+    "vitest": "^1.3.0",
     "webpack-sources": "^3.2.3"
   }
 }

@@ -137,6 +137,7 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     const result = selectorParser((selector: Root) => {
       selector.walkClasses((classNode: ClassName) => {
         if (classNode.type === 'class') {
+          // 这里会吞掉 \ 字符
           classNode.value = this.transform(classNode.value);
         }
 
@@ -197,6 +198,11 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     }
   }
 
+  /**
+   * @description: 传入代码，解析成ast，并且转换其中的字符串字面量
+   * @param {string} code
+   * @return {*}
+   */  
   private generateCode(code: string) {
     const ast = parseExpression(code);
 
@@ -208,8 +214,8 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     });
 
     const { code: newCode } = generate(ast, {
-      compact: true,
-      minified: true,
+      // 压缩，去掉空格
+      minified: false,
       jsescOption: {
         quotes: 'single',
       },
