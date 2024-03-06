@@ -4,6 +4,7 @@ import escapeStringRegexp from 'escape-string-regexp';
 import { parse as styleParser } from 'postcss';
 import type { Rule } from 'postcss';
 import { Source } from 'webpack-sources';
+import { Parser } from "htmlparser2";
 
 import generate from '@babel/generator';
 import { parseExpression } from '@babel/parser';
@@ -35,7 +36,7 @@ export class SelectorTransformer {
   /**
    * @description: 将className中匹配chars的值转换成对应的值
    * @param {string} className
-   * @return {*}
+   * @return {string}
    */
   transform(className: string) {
     Object.entries(this.mappingChars2String).forEach((item) => {
@@ -133,6 +134,24 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     });
   }
 
+  /**
+   * 基于htmlparser2对html进行解析
+   * @param rawSource 
+   */
+  wxmlHandlerV2(rawSource: string): string {
+    const parser = new Parser({
+
+      onattribute(name, value, quote) {
+        if (name === 'class' || name === 'hover-class') {
+          // 获取value然后传入wxmlTransform
+          
+        }
+      }
+    })
+  }
+
+
+
   _styleTransform(selector: string) {
     const result = selectorParser((selector: Root) => {
       selector.walkClasses((classNode: ClassName) => {
@@ -160,12 +179,12 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     const sources = [];
 
     while (match !== null) {
+      // 这里拿到sources是一组数组，一个元素代表了被{{}}包裹的js代码
       sources.push({
         start: match.index,
         end: variableRegExp.lastIndex,
         raw: match[1],
       });
-
       match = variableMatch(className);
     }
 
