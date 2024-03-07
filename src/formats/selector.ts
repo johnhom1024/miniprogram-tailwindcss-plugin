@@ -4,7 +4,8 @@ import escapeStringRegexp from 'escape-string-regexp';
 import { parse as styleParser } from 'postcss';
 import type { Rule } from 'postcss';
 import { Source } from 'webpack-sources';
-import { Parser } from "htmlparser2";
+import { Parser } from 'htmlparser2';
+import MagicString from 'magic-string';
 
 import generate from '@babel/generator';
 import { parseExpression } from '@babel/parser';
@@ -18,6 +19,8 @@ import {
   mainCssFileReg,
   wxmlFileReg,
 } from '../lib/reg';
+
+import { stripExpression } from '@/utils/wxml/utils';
 
 export class SelectorTransformer {
   mappingChars2String: Record<string, string>;
@@ -39,6 +42,28 @@ export class SelectorTransformer {
    * @return {string}
    */
   transform(className: string) {
+    Object.entries(this.mappingChars2String).forEach((item) => {
+      const [k, v] = item;
+
+      /**
+       * k中特殊的字符需要经过转义，然后再生成正则表达式，例如 k = .时
+       * 需要先转换成 \. 然后再给到new RegExp ，最终生成 /\./
+       * 这样可以匹配 . 字符 然后替换成 微信小程序中支持的字符
+       */
+      const regexp = new RegExp(escapeStringRegexp(k), 'g');
+      if (regexp.test(className)) {
+        className = className.replaceAll(regexp, v);
+      }
+    });
+
+    return className;
+  }
+
+  /**
+   * @param className 不包含表达式，单纯是tailwindcss的class
+   * @returns 特殊字符转换之后
+   */
+  transformClassName(className: string) {
     Object.entries(this.mappingChars2String).forEach((item) => {
       const [k, v] = item;
 
@@ -136,21 +161,26 @@ export class WechatSelectorTransformer extends SelectorTransformer {
 
   /**
    * 基于htmlparser2对html进行解析
-   * @param rawSource 
+   * @param rawSource
    */
   wxmlHandlerV2(rawSource: string): string {
+    const ms = new MagicString(rawSource);
+    
     const parser = new Parser({
-
-      onattribute(name, value, quote) {
-        if (name === 'class' || name === 'hover-class') {
-          // 获取value然后传入wxmlTransform
-          
+      onattribute: (name, value, quote) => {
+        if (value) {
+      
+          if (name === 'class' || name === 'hover-class') {
+            // 获取value进行处理，把一些特殊字符转换成小程序支持的字符
+            value = this._wxmlTransform(value);
+          }
         }
-      }
-    })
+      },
+    });
+
+    parser.write(rawSource);
+    parser.end();
   }
-
-
 
   _styleTransform(selector: string) {
     const result = selectorParser((selector: Root) => {
@@ -171,22 +201,7 @@ export class WechatSelectorTransformer extends SelectorTransformer {
   }
 
   _wxmlTransform(className: string): string {
-    function variableMatch(original: string) {
-      return variableRegExp.exec(original);
-    }
-    // 检查class属性是否传入了变量
-    let match = variableMatch(className);
-    const sources = [];
-
-    while (match !== null) {
-      // 这里拿到sources是一组数组，一个元素代表了被{{}}包裹的js代码
-      sources.push({
-        start: match.index,
-        end: variableRegExp.lastIndex,
-        raw: match[1],
-      });
-      match = variableMatch(className);
-    }
+    const sources = stripExpression(className);
 
     if (sources.length) {
       const resultArray: string[] = [];
@@ -194,13 +209,14 @@ export class WechatSelectorTransformer extends SelectorTransformer {
       let p = 0;
       for (let i = 0; i < sources.length; i++) {
         const m = sources[i];
+        // 转换
         resultArray.push(this.transform(className.slice(p, m.start)));
 
         p = m.start;
 
         // 匹配后值
         if (m.raw.trim().length) {
-          const code = this.generateCode(m.raw);
+          const code = this.transformCode(m.raw);
           m.raw = `{{${code}}}`;
         } else {
           m.raw = '';
@@ -221,8 +237,8 @@ export class WechatSelectorTransformer extends SelectorTransformer {
    * @description: 传入代码，解析成ast，并且转换其中的字符串字面量
    * @param {string} code
    * @return {*}
-   */  
-  private generateCode(code: string) {
+   */
+  private transformCode(code: string) {
     const ast = parseExpression(code);
 
     traverse(ast, {

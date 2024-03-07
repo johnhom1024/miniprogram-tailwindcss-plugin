@@ -2,7 +2,7 @@ import { variableRegExp } from '@/lib/reg';
 import { Parser } from 'htmlparser2';
 
 /**
- * @description: 从一个变量中剥离表达式
+ * @description: 从一个class变量中剥离表达式，并返回一个数组，每个元素的raw代表了被{{}}包裹的js代码
  * @param {string} original
  * @param {*} reg
  * @return {*}
