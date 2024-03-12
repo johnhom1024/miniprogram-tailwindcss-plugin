@@ -36,8 +36,9 @@ describe('测试selector转换', () => {
   });
 
   it('测试wxml中的class变量转换', () => {
-    const wxmlString = `<div :class="{{show ? 'w-[20rpx]' : 'w-2/3'}}">Hello, world!</div>`;
+    // 这里是wxml的语法，class变量的语法是{{}}，所以需要转换
+    const wxmlString = `<div class="{{show ? 'w-[20rpx]' : 'w-2/3'}}">Hello, world!</div>`;
 
-    expect(selectorTransformer.wxmlHandler(wxmlString)).toBe(`<div :class="{{show ? 'w-_20rpx_' : 'w-2s3'}}">Hello, world!</div>`);
+    expect(selectorTransformer.wxmlHandler(wxmlString)).toBe(`<div class="{{show ? 'w-_20rpx_' : 'w-2s3'}}">Hello, world!</div>`);
   });
 });

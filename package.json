@@ -20,7 +20,8 @@
   "scripts": {
     "release": "release-it",
     "build": "rollup -c --bundleConfigAsCjs",
-    "test": "vitest"
+    "test": "vitest",
+    "bench": "vitest bench"
   },
   "license": "ISC",
   "keywords": [
@@ -42,6 +43,8 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "htmlparser2": "^9.1.0",
+    "magic-string": "^0.30.8",
     "postcss": "^8.4.35",
     "postcss-selector-parser": "^6.0.15",
     "rollup": "^4.12.0",
