@@ -5,7 +5,7 @@
 ## TODO
 
 - [ ] 支持在template外转换tailwindcss
-- [ ] template的转换从正则改为htmlparser2进行解析
+- [x] template的转换从正则改为htmlparser2进行解析
 
 ## 这个插件为什么会出现
 
