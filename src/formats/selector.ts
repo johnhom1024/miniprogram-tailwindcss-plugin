@@ -142,37 +142,24 @@ export class WechatSelectorTransformer extends SelectorTransformer {
 
     return root.toString();
   }
-
-  /**
-   * @description: 处理html代码中的class
-   * @param {string} rawSource
-   * @return {*}
-   */
-  wxmlHandler(rawSource: string): string {
-    // 这里匹配开头的标签，例如：<view class="content">
-    return rawSource.replace(tagWithEitherClassAndHoverClassRegexp, (m0) => {
-      return m0.replace(vueTemplateClassRegexp, (match, className) => {
-        // match 匹配的结构为 class="font-bold"
-        // className的结构为 font-bold flex-[0_0_300rpx] 等
-        return match.replace(className, this._wxmlTransform(className));
-      });
-    });
-  }
-
   /**
    * 基于htmlparser2对html进行解析
-   * @param rawSource
+   * @param { string } rawSource
    */
-  wxmlHandlerV2(rawSource: string): string {
+  wxmlHandler(rawSource: string): string {
     const ms = new MagicString(rawSource);
-    
+    // 使用htmlparser2解析html
     const parser = new Parser({
-      onattribute: (name, value, quote) => {
-        if (value) {
-      
-          if (name === 'class' || name === 'hover-class') {
-            // 获取value进行处理，把一些特殊字符转换成小程序支持的字符
-            value = this._wxmlTransform(value);
+      onattribute: (attributeName, attributeValue, quote) => {
+        if (attributeValue) {
+          // TODO 后续支持其他的class自定义属性
+          if (attributeName === 'class' || attributeName === 'hover-class') {
+            // 获取attributeValue进行处理，把一些特殊字符转换成小程序支持的字符
+            // 这里parser.startIndex是从class开始算的，替换的位置应该是从 class=" 之后开始算的， 这里加2是为了跳过 = 和 "
+            const replaceStartIndex = parser.startIndex + attributeName.length + 2;
+            // 减1是因为忽略最后面的" 这个字符
+            const replaceEndIndex = parser.endIndex - 1; 
+            ms.update(replaceStartIndex, replaceEndIndex, this._wxmlTransform(attributeValue));
           }
         }
       },
@@ -180,6 +167,8 @@ export class WechatSelectorTransformer extends SelectorTransformer {
 
     parser.write(rawSource);
     parser.end();
+
+    return ms.toString();
   }
 
   _styleTransform(selector: string) {
@@ -202,7 +191,6 @@ export class WechatSelectorTransformer extends SelectorTransformer {
 
   _wxmlTransform(className: string): string {
     const sources = stripExpression(className);
-
     if (sources.length) {
       const resultArray: string[] = [];
 
