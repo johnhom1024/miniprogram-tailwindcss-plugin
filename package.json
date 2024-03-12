@@ -20,7 +20,8 @@
   "scripts": {
     "release": "release-it",
     "build": "rollup -c --bundleConfigAsCjs",
-    "test": "vitest"
+    "test": "vitest",
+    "bench": "vitest bench"
   },
   "license": "ISC",
   "keywords": [

@@ -143,7 +143,7 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     return root.toString();
   }
   /**
-   * 基于htmlparser2对html进行解析
+   * 基于htmlparser2对html进行解析，更加灵活，可以针对不同的属性进行处理
    * @param { string } rawSource
    */
   wxmlHandler(rawSource: string): string {
@@ -169,6 +169,23 @@ export class WechatSelectorTransformer extends SelectorTransformer {
     parser.end();
 
     return ms.toString();
+  }
+
+  /**
+   * @description: 使用正则表达式替换class
+   * @deprecated 已废弃，使用htmlparser2进行处理
+   * @param {string} rawSource
+   * @return {*}
+   */
+  wxmlHandlerOld(rawSource: string): string {
+    // 这里匹配开头的标签，例如：<view class="content">
+    return rawSource.replace(tagWithEitherClassAndHoverClassRegexp, (m0) => {
+      return m0.replace(vueTemplateClassRegexp, (match, className) => {
+        // match 匹配的结构为 class="font-bold"
+        // className的结构为 font-bold flex-[0_0_300rpx] 等
+        return match.replace(className, this._wxmlTransform(className));
+      });
+    });
   }
 
   _styleTransform(selector: string) {
